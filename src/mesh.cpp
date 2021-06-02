@@ -35,8 +35,11 @@ void Mesh::Init() {
     } catch (...) {
         std::cout
             << "Exception caught while loading mesh... Please only feed in "
-               "an obj mesh with no normal/texture information\n";
+               "a triangle mesh (in obj format) with no normal/texture "
+               "information\n";
     }
+    std::cout << "Read in mesh with " << mVertices.size() << " vertices and "
+              << mFaces.size() << " faces.\n";
 }
 
 Point3f Mesh::FindClosestPointNaive(Point3f& pt, Float R) {
@@ -60,4 +63,7 @@ Point3f Mesh::FindClosestPoint(Point3f& pt, Float R) {
     // query traversal
 }
 
-void Mesh::BuildSphereTree() {}
+void Mesh::BuildSphereTree() {
+    mSTree = new SphereTree(mVertices, mFaces);
+    mSTree->BuildTree();
+}

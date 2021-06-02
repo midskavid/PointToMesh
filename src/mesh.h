@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "point.h"
+#include "spheretree.h"
 
 class Mesh {
 public:
@@ -21,6 +22,7 @@ private:
 public:
     std::vector<Point3f> mVertices;
     std::vector<std::vector<unsigned int>> mFaces;
+    SphereTree* mSTree = nullptr;
 };
 
 #endif
