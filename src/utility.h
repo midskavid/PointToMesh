@@ -6,7 +6,10 @@
 
 namespace geometry {
     // Return L2 ssquared distance between two 3D points
-    Float L2squared(Point3f& pt1, Point3f& pt2);
+    Float L2squared(const Point3f& pt1, const Point3f& pt2);
+
+    // Return L2 distance between two 3D points
+    Float L2(const Point3f& pt1, const Point3f& pt2);
 
     // Return the closest point on a triangle to a given point.
     // Return infinity if the closest point does not lie in a sphere of radius R

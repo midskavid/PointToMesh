@@ -2,6 +2,7 @@
 #include <memory>
 
 #include "mesh.h"
+#include "point.h"
 
 int main(int argc, char* argv[]) {
     std::string filename = "";
@@ -18,5 +19,7 @@ int main(int argc, char* argv[]) {
     auto meshHandle = std::make_unique<Mesh>(filename);
     meshHandle->Init();  // Read in the file
     meshHandle->BuildSphereTree();
+    Point3f tmp{-100, 1, 0};
+    meshHandle->FindClosestPoint(tmp, 50);
     return 0;
 }

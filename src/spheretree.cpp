@@ -4,6 +4,44 @@
 #include "spheretree.h"
 #include "utility.h"
 
+namespace {
+    void printBT(const std::string& prefix,
+                 const SphereNode* node,
+                 bool isLeft) {
+        if (node != nullptr) {
+            std::cout << prefix;
+
+            std::cout << (isLeft ? "├──" : "└──");
+
+            // print the value of the node
+            std::cout << node->id << std::endl;
+            // std::cout << "*" << std::endl;
+            // enter the next tree level - left and right branch
+            printBT(prefix + (isLeft ? "│   " : "    "), node->left, true);
+            printBT(prefix + (isLeft ? "│   " : "    "), node->right, false);
+        }
+    }
+
+    void printBT(const SphereNode* node) {
+        printBT("", node, false);
+    }
+    void printBTLevel(SphereNode* node) {
+        std::queue<SphereNode*> Q;
+        Q.emplace(node);
+
+        while (!Q.empty()) {
+            int len = Q.size();
+            std::cout << len << std::endl;
+            while (len--) {
+                auto top = Q.front();
+                Q.pop();
+                if (top->left) Q.emplace(top->left);
+                if (top->right) Q.emplace(top->right);
+            }
+        }
+    }
+}  // namespace
+
 SphereTree::SphereTree(std::vector<Point3f>& vertices,
                        std::vector<std::vector<unsigned int>>& faces) {
     int facenum = 0;
@@ -17,9 +55,10 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
                                  geometry::L2squared(v2, c),
                                  geometry::L2squared(v3, c)}));
 #pragma message("Figure out emplace")
-        auto node = new SphereNode(nullptr, nullptr, R, c);
-        node->id = std::to_string(facenum++) + "_";
+        auto node = new SphereNode(nullptr, nullptr, R, c, facenum);
+        node->id = std::to_string(facenum) + "_";
         mData.emplace_back(node);
+        ++facenum;
     }
 }
 
@@ -32,7 +71,8 @@ void SphereTree::BuildTree() {
     while (buildFurther) {
         buildFurther = false;
         // std::cout << threshold << std::endl;
-        threshold -= .005;
+        // threshold -= .05;
+        threshold += .2;
         for (auto it1 = mData.begin(); it1 != mData.end();) {
             bool incit1 = true;
             for (auto it2 = std::next(it1); it2 != mData.end(); ++it2) {
@@ -92,43 +132,60 @@ void SphereTree::BuildTree() {
     // PrintTree();
 }
 
-void printBT(const std::string& prefix, const SphereNode* node, bool isLeft) {
-    if (node != nullptr) {
-        std::cout << prefix;
-
-        std::cout << (isLeft ? "├──" : "└──");
-
-        // print the value of the node
-        std::cout << node->id << std::endl;
-        // std::cout << "*" << std::endl;
-        // enter the next tree level - left and right branch
-        printBT(prefix + (isLeft ? "│   " : "    "), node->left, true);
-        printBT(prefix + (isLeft ? "│   " : "    "), node->right, false);
-    }
-}
-
-void printBT(const SphereNode* node) {
-    printBT("", node, false);
-}
-void printBTLevel(SphereNode* node) {
-    std::queue<SphereNode*> Q;
-    Q.emplace(node);
-
-    while (!Q.empty()) {
-        int len = Q.size();
-        std::cout << len << std::endl;
-        while (len--) {
-            auto top = Q.front();
-            Q.pop();
-            if (top->left) Q.emplace(top->left);
-            if (top->right) Q.emplace(top->right);
-        }
-    }
-}
 void SphereTree::PrintTree() {
     for (auto& t : mData) {
         printBTLevel(t);
         // printBT(t);
         std::cout << "====================\n";
     }
+}
+
+std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt,
+                                                  const Float& R) {
+    Float dmin = Infinity;
+    for (const auto& s : mData) {
+        dmin = std::min(geometry::L2(pt, s->center) + s->radius, dmin);
+    }
+
+    // now traverse tree and get list of faces
+    std::vector<unsigned int> fclist;
+    std::vector<SphereNode*> slist;
+    for (const auto& s : mData) { TraverseGetFaces(pt, R, dmin, slist, s); }
+#pragma message("Another sanity check to further reduce the list..")
+    int cignr = 0;
+    for (const auto& s : slist) {
+        if (geometry::L2(pt, s->center) - s->radius < dmin) {
+            fclist.emplace_back(s->fID);
+        } else {
+            ++cignr;
+        }
+    }
+    std::cout << "ignored " << cignr << std::endl;
+    return fclist;
+}
+
+void SphereTree::TraverseGetFaces(const Point3f& pt,
+                                  const Float& R,
+                                  Float& dmin,
+                                  std::vector<SphereNode*>& slist,
+                                  SphereNode* root) {
+    if (!root) return;
+    if (geometry::L2(pt, root->center) - root->radius > dmin) {
+        return;  // No need to recurse here
+    }
+
+    if (!root->left && !root->right) {
+        // leaf
+        slist.emplace_back(root);
+    }
+
+    if (root->left)
+        dmin = std::min(
+            geometry::L2(pt, root->left->center) + root->left->radius, dmin);
+    if (root->right)
+        dmin = std::min(
+            geometry::L2(pt, root->right->center) + root->right->radius, dmin);
+
+    TraverseGetFaces(pt, R, dmin, slist, root->left);
+    TraverseGetFaces(pt, R, dmin, slist, root->right);
 }

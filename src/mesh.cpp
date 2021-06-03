@@ -61,6 +61,9 @@ Point3f Mesh::FindClosestPointNaive(Point3f& pt, Float R) {
 Point3f Mesh::FindClosestPoint(Point3f& pt, Float R) {
     // Construct Brute force tree for now.. (done once)
     // query traversal
+    auto faceList = mSTree->GetFaceList(pt, R);
+    std::cout << "Faces to consider : " << faceList.size() << std::endl;
+    return {};
 }
 
 void Mesh::BuildSphereTree() {
