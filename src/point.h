@@ -47,6 +47,10 @@ public:
         return Point3<T>(x - p.x, y - p.y, z - p.z);
     }
     template <typename U>
+    Point3<T> operator*(U f) const {
+        return Point3<T>(f * x, f * y, f * z);
+    }
+    template <typename U>
     Point3<T> operator/(U f) const {
         Float inv = (Float)1 / f;
         return Point3<T>(inv * x, inv * y, inv * z);

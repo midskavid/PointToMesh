@@ -26,12 +26,13 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
 void SphereTree::BuildTree() {
     bool buildFurther = true;
     int level = 0;
-    std::cout << "Pehele " << mData.size() << std::endl;
+    std::cout << "Working list size before building tree " << mData.size()
+              << std::endl;
     Float threshold = 1.0;
     while (buildFurther) {
         buildFurther = false;
         // std::cout << threshold << std::endl;
-        threshold += .1;
+        threshold -= .005;
         for (auto it1 = mData.begin(); it1 != mData.end();) {
             bool incit1 = true;
             for (auto it2 = std::next(it1); it2 != mData.end(); ++it2) {
@@ -42,10 +43,25 @@ void SphereTree::BuildTree() {
                 auto c1 = (*it1)->center;
                 auto c2 = (*it2)->center;
 
-                auto c12 = (c1 + c2) / 2;
-                Float r12 = std::max(r1 + sqrt(geometry::L2squared(c12, c1)),
-                                     r2 + sqrt(geometry::L2squared(c12, c2)));
+                auto D = sqrt(geometry::L2squared(c2, c1));
+                Point3f c12 = c1 * ((Float)0.5 + ((r1 - r2) / (2 * D))) +
+                              c2 * ((Float)0.5 + ((r2 - r1) / (2 * D)));
+                Float r12 = (D + r1 + r2) / 2;
+                if (r1 < r2) {
+                    if (D + r1 <= r2) {  // contains
+                        c12 = c2;
+                        r12 = r2;
+                    }
+                } else {
+                    if (D + r2 <= r1) {  // contains
+                        c12 = c1;
+                        r12 = r1;
+                    }
+                }
 
+                // std::cout << "r1 : " << r1 << " r2 : " << r2 << " r12 " <<
+                // r12
+                //           << std::endl;
                 // std::cout << "Consider " << (*it1)->id << " " << (*it2)->id;
 
                 // std::cout << " Ratio : "
@@ -71,8 +87,9 @@ void SphereTree::BuildTree() {
             if (incit1) { ++it1; }
         }
     }
-    std::cout << "Badme " << mData.size() << std::endl;
-    PrintTree();
+    std::cout << "Working list size after building tree " << mData.size()
+              << std::endl;
+    // PrintTree();
 }
 
 void printBT(const std::string& prefix, const SphereNode* node, bool isLeft) {
