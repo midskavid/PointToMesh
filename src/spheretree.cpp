@@ -49,11 +49,24 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
         auto v1 = vertices[f[0]];
         auto v2 = vertices[f[1]];
         auto v3 = vertices[f[2]];
-
+#if 0        
         auto c = (v1 + v2 + v3) / 3;  // convex and therefore inside triangle
         Float R = sqrt(std::max({geometry::L2squared(v1, c),
                                  geometry::L2squared(v2, c),
                                  geometry::L2squared(v3, c)}));
+#else
+        Point3f v31 = v3 - v1;
+        Point3f v21 = v2 - v1;
+        Point3f v21Xv31 = geometry::cross(v21, v31);
+
+        Point3f toCenter =
+            (geometry::cross(v21Xv31, v21) * geometry::Lensq(v31) +
+             geometry::cross(v31, v21Xv31) * geometry::Lensq(v21)) /
+            ((Float)2. * geometry::Lensq(v21Xv31));
+
+        Float R = sqrt(geometry::Lensq(toCenter));
+        auto c = v1 + toCenter;
+#endif
 #pragma message("Figure out emplace")
         auto node = new SphereNode(nullptr, nullptr, R, c, facenum);
         node->id = std::to_string(facenum) + "_";

@@ -14,11 +14,18 @@ namespace geometry {
     // Return the closest point on a triangle to a given point.
     // Return infinity if the closest point does not lie in a sphere of radius R
     // centered at the given point
-    Point3f GetClosestPtToTriangle(Point3f& v1,
+    Point3f GetClosestPtToTriangle(Point3f& v0,
+                                   Point3f& v1,
                                    Point3f& v2,
-                                   Point3f& v3,
                                    Point3f& pt,
                                    Float R,
                                    Float& closestDist);
+
+    Point3f cross(const Point3f& v1, const Point3f& v2);
+
+    Float dot(const Point3f& v1, const Point3f& v2);
+
+    Float Lensq(const Point3f& pt1);
+
 }  // namespace geometry
 #endif
