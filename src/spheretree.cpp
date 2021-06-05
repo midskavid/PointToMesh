@@ -77,15 +77,16 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
 
 void SphereTree::BuildTree() {
     bool buildFurther = true;
-    int level = 0;
+
     std::cout << "Working list size before building tree " << mData.size()
               << std::endl;
     Float threshold = 1.0;
+    int level = 5;
     while (buildFurther) {
         buildFurther = false;
         // std::cout << threshold << std::endl;
         // threshold -= .05;
-        threshold += .2;
+        threshold += .1;
         for (auto it1 = mData.begin(); it1 != mData.end();) {
             bool incit1 = true;
             for (auto it2 = std::next(it1); it2 != mData.end(); ++it2) {
@@ -124,6 +125,12 @@ void SphereTree::BuildTree() {
                 if (((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 * r2)) <
                     threshold) {  // threshold?
                     // merge nodes
+                    // std::cout
+                    //     << " Ratio : "
+                    //     << ((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 *
+                    //     r2))
+                    //     << std::endl;
+
                     // std::cout << "Merging " << (*it1)->id << " " <<
                     // (*it2)->id
                     //           << std::endl;
