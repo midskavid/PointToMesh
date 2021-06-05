@@ -19,28 +19,38 @@ int main(int argc, char* argv[]) {
 
     auto meshHandle = std::make_unique<Mesh>(filename);
     meshHandle->Init();  // Read in the file
-    meshHandle->BuildSphereTree();
-    Point3f tmp{100, 100, 100};
 
     auto start = std::chrono::steady_clock::now();
-    std::cout << "From naive " << meshHandle->FindClosestPointNaive(tmp, 50)
-              << std::endl;
+    meshHandle->BuildSphereTree();
     auto end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time in microseconds: "
-              << std::chrono::duration_cast<std::chrono::microseconds>(end -
+
+    std::cout << "Elapsed time in milliseconds for building tree : "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end -
                                                                        start)
                      .count()
               << " ms" << std::endl;
+
+    Point3f tmp{-10, -10, 100};
 
     start = std::chrono::steady_clock::now();
-    std::cout << "From jojo " << meshHandle->FindClosestPoint(tmp, 50)
-              << std::endl;
+    auto pt1 = meshHandle->FindClosestPointNaive(tmp, 50);
     end = std::chrono::steady_clock::now();
-    std::cout << "Elapsed time in microseconds: "
+    std::cout << "Elapsed time in microseconds for naive : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end -
                                                                        start)
                      .count()
-              << " ms" << std::endl;
+              << " micros" << std::endl;
 
+    start = std::chrono::steady_clock::now();
+    auto pt2 = meshHandle->FindClosestPoint(tmp, 50);
+    end = std::chrono::steady_clock::now();
+    std::cout << "Elapsed time in microseconds for sphere : "
+              << std::chrono::duration_cast<std::chrono::microseconds>(end -
+                                                                       start)
+                     .count()
+              << " micros" << std::endl;
+
+    std::cout << pt1 << std::endl;
+    std::cout << pt2 << std::endl;
     return 0;
 }

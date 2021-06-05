@@ -48,8 +48,12 @@ Point3f Mesh::FindClosestPointNaive(Point3f& pt, Float R) {
     Float closestDistance = Infinity;
     for (const auto& f : mFaces) {
         Float dist = Infinity;
-        auto ptTri = geometry::GetClosestPtToTriangle(
-            mVertices[f[0]], mVertices[f[1]], mVertices[f[2]], pt, R, dist);
+        auto ptTri = geometry::GetClosestPtToTriangle(mVertices[f[0] - 1],
+                                                      mVertices[f[1] - 1],
+                                                      mVertices[f[2] - 1],
+                                                      pt,
+                                                      R,
+                                                      dist);
         if (dist < closestDistance) {
             closestPoint = ptTri;
             closestDistance = dist;
@@ -70,8 +74,12 @@ Point3f Mesh::FindClosestPoint(Point3f& pt, Float R) {
     for (const auto& face : faceList) {
         Float dist = Infinity;
         auto f = mFaces[face];
-        auto ptTri = geometry::GetClosestPtToTriangle(
-            mVertices[f[0]], mVertices[f[1]], mVertices[f[2]], pt, R, dist);
+        auto ptTri = geometry::GetClosestPtToTriangle(mVertices[f[0] - 1],
+                                                      mVertices[f[1] - 1],
+                                                      mVertices[f[2] - 1],
+                                                      pt,
+                                                      R,
+                                                      dist);
         if (dist < closestDistance) {
             closestPoint = ptTri;
             closestDistance = dist;

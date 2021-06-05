@@ -44,11 +44,11 @@ namespace {
 
 SphereTree::SphereTree(std::vector<Point3f>& vertices,
                        std::vector<std::vector<unsigned int>>& faces) {
-    int facenum = 0;
+    int facenum = 1;
     for (const auto& f : faces) {
-        auto v1 = vertices[f[0]];
-        auto v2 = vertices[f[1]];
-        auto v3 = vertices[f[2]];
+        auto v1 = vertices[f[0] - 1];
+        auto v2 = vertices[f[1] - 1];
+        auto v3 = vertices[f[2] - 1];
 #if 0        
         auto c = (v1 + v2 + v3) / 3;  // convex and therefore inside triangle
         Float R = sqrt(std::max({geometry::L2squared(v1, c),
@@ -86,7 +86,7 @@ void SphereTree::BuildTree() {
         buildFurther = false;
         // std::cout << threshold << std::endl;
         // threshold -= .05;
-        threshold += .1;
+        threshold += 2;
         for (auto it1 = mData.begin(); it1 != mData.end();) {
             bool incit1 = true;
             for (auto it2 = std::next(it1); it2 != mData.end(); ++it2) {
