@@ -1,2 +1,4 @@
 .vscode/*
 Point2Mesh
+release/*
+debug/*

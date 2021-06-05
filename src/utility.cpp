@@ -24,6 +24,8 @@ namespace geometry {
                                    Point3f& pt,
                                    Float R,
                                    Float& closestDist) {
+#pragma message("Clean this")
+        (void)R;
         Point3f edge0 = v1 - v0;
         Point3f edge1 = v2 - v0;
         Point3f v0pt = v0 - pt;

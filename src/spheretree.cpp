@@ -81,11 +81,8 @@ void SphereTree::BuildTree() {
     std::cout << "Working list size before building tree " << mData.size()
               << std::endl;
     Float threshold = 1.0;
-    int level = 5;
     while (buildFurther) {
         buildFurther = false;
-        // std::cout << threshold << std::endl;
-        // threshold -= .05;
         threshold += 2;
         for (auto it1 = mData.begin(); it1 != mData.end();) {
             bool incit1 = true;
@@ -155,7 +152,7 @@ void SphereTree::BuildTree() {
 void SphereTree::PrintTree() {
     for (auto& t : mData) {
         printBTLevel(t);
-        // printBT(t);
+        printBT(t);
         std::cout << "====================\n";
     }
 }
