@@ -7,14 +7,33 @@
 
 int main(int argc, char* argv[]) {
     std::string filename = "";
-    if (argc == 1) {
-        std::cout
-            << "No path specified for mesh.. Using default file bunny.obj\n";
-        filename = "bunny.obj";
-    }
-    if (argc == 2) {
-        std::cout << "Using mesh " << argv[1] << std::endl;
-        filename = argv[1];
+    Point3f inPoint{-10, -10, 100};
+    switch (argc) {
+        case 1: {
+            std::cout << "No path specified for mesh.. Using default file "
+                         "bunny.obj\n";
+            filename = "bunny.obj";
+            break;
+        }
+        case 5: {
+            try {
+                inPoint = Point3f(
+                    std::stof(argv[2]), std::stof(argv[3]), std::stof(argv[4]));
+            } catch (...) {
+                std::cout << "specify a 3D point\n";
+                exit(1);
+            }
+        }
+        case 2: {
+            std::cout << "Using mesh " << argv[1] << std::endl;
+            filename = argv[1];
+            break;
+        }
+        default: {
+            std::cout << "Invalid arguments. Correct way to run "
+                      << "./PointtMesh <filename> <x y z>\n";
+            exit(1);
+        }
     }
 
     auto meshHandle = std::make_unique<Mesh>(filename);
@@ -30,10 +49,8 @@ int main(int argc, char* argv[]) {
                      .count()
               << " ms" << std::endl;
 
-    Point3f tmp{-10, -10, 100};
-
     start = std::chrono::steady_clock::now();
-    auto pt1 = meshHandle->FindClosestPointNaive(tmp, 50);
+    auto pt1 = meshHandle->FindClosestPointNaive(inPoint, 50);
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time in microseconds for naive : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end -
@@ -42,7 +59,7 @@ int main(int argc, char* argv[]) {
               << " micros" << std::endl;
 
     start = std::chrono::steady_clock::now();
-    auto pt2 = meshHandle->FindClosestPoint(tmp, 50);
+    auto pt2 = meshHandle->FindClosestPoint(inPoint, 50);
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time in microseconds for sphere : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end -

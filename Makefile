@@ -2,7 +2,7 @@
 # Compiler flags
 #
 CC     = g++
-CFLAGS = -std=c++17 -Wall -Werror -Wextra
+CFLAGS = -std=c++17 -Wall -Werror
 
 #
 # Project files

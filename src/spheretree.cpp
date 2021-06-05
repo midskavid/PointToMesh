@@ -10,13 +10,8 @@ namespace {
                  bool isLeft) {
         if (node != nullptr) {
             std::cout << prefix;
-
             std::cout << (isLeft ? "├──" : "└──");
-
-            // print the value of the node
             std::cout << node->id << std::endl;
-            // std::cout << "*" << std::endl;
-            // enter the next tree level - left and right branch
             printBT(prefix + (isLeft ? "│   " : "    "), node->left, true);
             printBT(prefix + (isLeft ? "│   " : "    "), node->right, false);
         }
@@ -46,15 +41,11 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
                        std::vector<std::vector<unsigned int>>& faces) {
     int facenum = 1;
     for (const auto& f : faces) {
+        // Get the circumcircle
         auto v1 = vertices[f[0] - 1];
         auto v2 = vertices[f[1] - 1];
         auto v3 = vertices[f[2] - 1];
-#if 0        
-        auto c = (v1 + v2 + v3) / 3;  // convex and therefore inside triangle
-        Float R = sqrt(std::max({geometry::L2squared(v1, c),
-                                 geometry::L2squared(v2, c),
-                                 geometry::L2squared(v3, c)}));
-#else
+
         Point3f v31 = v3 - v1;
         Point3f v21 = v2 - v1;
         Point3f v21Xv31 = geometry::cross(v21, v31);
@@ -66,10 +57,11 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
 
         Float R = sqrt(geometry::Lensq(toCenter));
         auto c = v1 + toCenter;
-#endif
 #pragma message("Figure out emplace")
         auto node = new SphereNode(nullptr, nullptr, R, c, facenum);
+#ifdef DEBUG
         node->id = std::to_string(facenum) + "_";
+#endif
         mData.emplace_back(node);
         ++facenum;
     }
@@ -110,27 +102,18 @@ void SphereTree::BuildTree() {
                     }
                 }
 
-                // std::cout << "r1 : " << r1 << " r2 : " << r2 << " r12 " <<
-                // r12
-                //           << std::endl;
-                // std::cout << "Consider " << (*it1)->id << " " << (*it2)->id;
-
-                // std::cout << " Ratio : "
-                //           << ((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 *
-                //           r2))
-                //           << std::endl;
                 if (((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 * r2)) <
-                    threshold) {  // threshold?
+                    threshold) {
                     // merge nodes
-                    // std::cout
-                    //     << " Ratio : "
-                    //     << ((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 *
-                    //     r2))
-                    //     << std::endl;
+#ifdef DEBUG
+                    std::cout
+                        << " Ratio : "
+                        << ((r12 * r12 * r12) / (r1 * r1 * r1 + r2 * r2 * r2))
+                        << std::endl;
 
-                    // std::cout << "Merging " << (*it1)->id << " " <<
-                    // (*it2)->id
-                    //           << std::endl;
+                    std::cout << "Merging " << (*it1)->id << " " << (*it2)->id
+                              << std::endl;
+#endif
                     auto node = new SphereNode(*it1, *it2, r12, c12);
                     node->id = (*it1)->id + "_" + (*it2)->id;
                     mData.emplace_back(node);
@@ -146,7 +129,9 @@ void SphereTree::BuildTree() {
     }
     std::cout << "Working list size after building tree " << mData.size()
               << std::endl;
-    // PrintTree();
+#ifdef DEBUG
+    PrintTree();
+#endif
 }
 
 void SphereTree::PrintTree() {
@@ -177,7 +162,9 @@ std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt,
             ++cignr;
         }
     }
-    std::cout << "ignored " << cignr << std::endl;
+#ifdef DEBUG
+    std::cout << "Finally ignored " << cignr << std::endl;
+#endif
     return fclist;
 }
 

@@ -63,7 +63,10 @@ Point3f Mesh::FindClosestPointNaive(Point3f& pt, Float R) {
 }
 
 Point3f Mesh::FindClosestPoint(Point3f& pt, Float R) {
-    // Construct Brute force tree for now.. (done once)
+    if (!mSTree) {
+        std::cout << "BuildSphereTree() first\n";
+        return {Infinity, Infinity, Infinity};
+    }
     // query traversal
     auto faceList = mSTree->GetFaceList(pt, R);
     std::cout << "Faces to consider : " << faceList.size() << std::endl;
@@ -73,7 +76,7 @@ Point3f Mesh::FindClosestPoint(Point3f& pt, Float R) {
     Float closestDistance = Infinity;
     for (const auto& face : faceList) {
         Float dist = Infinity;
-        auto f = mFaces[face];
+        auto f = mFaces[face - 1];
         auto ptTri = geometry::GetClosestPtToTriangle(mVertices[f[0] - 1],
                                                       mVertices[f[1] - 1],
                                                       mVertices[f[2] - 1],
