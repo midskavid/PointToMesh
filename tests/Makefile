@@ -15,12 +15,10 @@ RELCFLAGS = -O3 -DFLOAT_AS_DOUBLE
 .PHONY: all clean release remake
 
 # Default build
-all: $(EXE)
+all: clean $(EXE)
 
 $(EXE):
 	$(CC) $(CFLAGS) $(RELCFLAGS) -o $(EXE) $(SRCS)
-
-remake: clean all
 
 clean:
 	rm -f $(EXE)
