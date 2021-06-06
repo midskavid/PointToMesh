@@ -35,36 +35,41 @@ void test_PointToTriange() {
         Point3f v1{dtbn(e2), dtbn(e2), dtbn(e2)};
         Point3f v2{dtbn(e2), dtbn(e2), dtbn(e2)};
         Point3f pt{dtbn(e2), dtbn(e2), dtbn(e2)};
-        Float R = dtbn(e2);
+
         Float distNaive, distFast;
 
         auto ptNaive =
-            geometry::GetClosestPtToTriangleNaive(v0, v1, v2, pt, R, distNaive);
-        auto ptFast =
-            geometry::GetClosestPtToTriangle(v0, v1, v2, pt, R, distFast);
+            geometry::GetClosestPtToTriangle(v0, v1, v2, pt, distNaive);
+        auto ptFast = geometry::GetClosestPtToTriangle_Reference(
+            v0, v1, v2, pt, distFast);
 
-        (void)ptNaive;
         (void)ptFast;
+        (void)ptNaive;
+        // std::cout << ptNaive << " " << ptFast << std::endl;
+        // std::cout << distNaive << " " << distFast << std::endl;
+
         std::cout << v0 << v1 << v2 << pt << std::endl;
         assert(isEqual(distNaive, distFast, 0.0001));
     }
 }
 
-void debugggg() {
-    Point3f v0{-30.6029, 8.1887, 84.5227};
-    Point3f v1{78.976, 56.8925, 50.407};
-    Point3f v2{-85.1837, 41.8884, -90.0125};
-    Point3f pt{-60.7484, 82.1106, -6.70635};
+void debug_PointToTriangle() {
+    Point3f v0{7, -1, 4};
+    Point3f v1{6, -5, 2};
+    Point3f v2{3, 1, -4};
+    Point3f pt{-3, -9, 5};
 
-    Float R = 0;
     Float distNaive, distFast;
 
-    auto ptNaive =
-        geometry::GetClosestPtToTriangleNaive(v0, v1, v2, pt, R, distNaive);
-    auto ptFast = geometry::GetClosestPtToTriangle(v0, v1, v2, pt, R, distFast);
+    auto ptNaive = geometry::GetClosestPtToTriangle(v0, v1, v2, pt, distNaive);
+    auto ptFast =
+        geometry::GetClosestPtToTriangle_Reference(v0, v1, v2, pt, distFast);
 
-    std::cout << ptNaive << std::endl;
-    std::cout << ptFast << std::endl;
+    std::cout << "my pt : " << ptNaive << std::endl;
+    std::cout << "reference pt " << ptFast << std::endl;
+
+    std::cout << "my dist " << distNaive << std::endl;
+    std::cout << "refer dist " << distFast << std::endl;
 }
 
 void test_Point2Mesh() {
@@ -83,8 +88,8 @@ void test_Point2Mesh() {
     for (auto ii = 0; ii < 1000; ++ii) {
         Point3f pt{dtbn(e2), dtbn(e2), dtbn(e2)};
         // Float R = dtbn(e2);
-        auto pt1 = meshHandle->FindClosestPointNaive(pt, 50);
-        auto pt2 = meshHandle->FindClosestPoint(pt, 50);
+        auto pt1 = meshHandle->FindClosestPointNaive(pt);
+        auto pt2 = meshHandle->FindClosestPoint(pt);
         ASSERT(isEqual(pt1.x, pt2.x, 0.0001),
                "pt is " << pt1 << " for Naive vs " << pt2
                         << " for SphereTree. Dist is " << geometry::L2(pt1, pt)
@@ -121,7 +126,7 @@ void run_Perf() {
 
     std::cout << "Running Naive\n";
     auto start = std::chrono::steady_clock::now();
-    for (auto& pt : points) { meshHandle->FindClosestPointNaive(pt, 1000); }
+    for (auto& pt : points) { meshHandle->FindClosestPointNaive(pt); }
     auto end = std::chrono::steady_clock::now();
 
     std::cout << "time elapsed for 1000 points with naive algo : "
@@ -133,7 +138,7 @@ void run_Perf() {
     std::cout << "Running SphereTree (includes building it once)\n";
     start = std::chrono::steady_clock::now();
     meshHandle->BuildSphereTree();
-    for (auto& pt : points) { meshHandle->FindClosestPoint(pt, 1000); }
+    for (auto& pt : points) { meshHandle->FindClosestPoint(pt); }
     end = std::chrono::steady_clock::now();
 
     std::cout << "time elapsed for 1000 points with sphere tree algo : "
@@ -144,7 +149,7 @@ void run_Perf() {
 }
 
 int main() {
-    // debugggg();
+    // debug_PointToTriangle();
     // test_PointToTriange();
     test_Point2Mesh();
     run_Perf();

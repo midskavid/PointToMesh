@@ -26,12 +26,12 @@ public:
     SphereTree(std::vector<Point3f>& vertices,
                std::vector<std::vector<unsigned int>>& faces);
     void BuildTree();
-    std::vector<unsigned int> GetFaceList(const Point3f& pt, const Float& R);
+    std::vector<unsigned int> GetFaceList(const Point3f& pt);
 
 private:
     void PrintTree();
     void TraverseGetFaces(const Point3f& pt,
-                          const Float& R,
+
                           Float& dmin,
                           std::vector<SphereNode*>& slist,
                           SphereNode* root);

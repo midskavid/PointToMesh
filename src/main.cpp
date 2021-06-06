@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
               << " ms" << std::endl;
 
     start = std::chrono::steady_clock::now();
-    auto pt1 = meshHandle->FindClosestPointNaive(inPoint, 50);
+    auto pt1 = meshHandle->FindClosestPointNaive(inPoint);
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time in microseconds for naive : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end -
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
               << " micros" << std::endl;
 
     start = std::chrono::steady_clock::now();
-    auto pt2 = meshHandle->FindClosestPoint(inPoint, 50);
+    auto pt2 = meshHandle->FindClosestPoint(inPoint);
     end = std::chrono::steady_clock::now();
     std::cout << "Elapsed time in microseconds for sphere : "
               << std::chrono::duration_cast<std::chrono::microseconds>(end -

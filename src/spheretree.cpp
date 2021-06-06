@@ -57,7 +57,6 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
 
         Float R = sqrt(geometry::Lensq(toCenter));
         auto c = v1 + toCenter;
-#pragma message("Figure out emplace")
         auto node = new SphereNode(nullptr, nullptr, R, c, facenum);
 #ifdef DEBUG
         node->id = std::to_string(facenum) + "_";
@@ -145,8 +144,7 @@ void SphereTree::PrintTree() {
     }
 }
 
-std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt,
-                                                  const Float& R) {
+std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt) {
     Float dmin = Infinity;
     for (const auto& s : mData) {
         dmin = std::min(geometry::L2(pt, s->center) + s->radius, dmin);
@@ -155,8 +153,7 @@ std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt,
     // now traverse tree and get list of faces
     std::vector<unsigned int> fclist;
     std::vector<SphereNode*> slist;
-    for (const auto& s : mData) { TraverseGetFaces(pt, R, dmin, slist, s); }
-#pragma message("Another sanity check to further reduce the list..")
+    for (const auto& s : mData) { TraverseGetFaces(pt, dmin, slist, s); }
     int cignr = 0;
     for (const auto& s : slist) {
         if (geometry::L2(pt, s->center) - s->radius < dmin) {
@@ -172,7 +169,7 @@ std::vector<unsigned int> SphereTree::GetFaceList(const Point3f& pt,
 }
 
 void SphereTree::TraverseGetFaces(const Point3f& pt,
-                                  const Float& R,
+
                                   Float& dmin,
                                   std::vector<SphereNode*>& slist,
                                   SphereNode* root) {
@@ -193,6 +190,6 @@ void SphereTree::TraverseGetFaces(const Point3f& pt,
         dmin = std::min(
             geometry::L2(pt, root->right->center) + root->right->radius, dmin);
 
-    TraverseGetFaces(pt, R, dmin, slist, root->left);
-    TraverseGetFaces(pt, R, dmin, slist, root->right);
+    TraverseGetFaces(pt, dmin, slist, root->left);
+    TraverseGetFaces(pt, dmin, slist, root->right);
 }

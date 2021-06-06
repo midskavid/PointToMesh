@@ -12,8 +12,8 @@ class Mesh {
 public:
     Mesh(std::string filename) : fn_(filename) {}
     void Init();
-    Point3f FindClosestPointNaive(Point3f& pt, Float R);
-    Point3f FindClosestPoint(Point3f& pt, Float R);
+    Point3f FindClosestPointNaive(Point3f& pt);
+    Point3f FindClosestPoint(Point3f& pt);
     void BuildSphereTree();
 
 private:
