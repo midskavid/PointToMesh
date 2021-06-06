@@ -10,7 +10,7 @@ CFLAGS = -std=c++17 -Wall -Werror -I../src/
 SRCS = test.cpp ../src/mesh.cpp ../src/spheretree.cpp ../src/utility.cpp
 EXE  = TestPoint2Mesh
 
-RELCFLAGS = -O3 -DFLOAT_AS_DOUBLE
+RELCFLAGS = -O3 -DFLOAT_AS_DOUBLE -DTESTS
 
 .PHONY: all clean release remake
 

@@ -69,9 +69,10 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
 
 void SphereTree::BuildTree() {
     bool buildFurther = true;
-
+#ifndef TESTS
     std::cout << "Working list size before building tree " << mData.size()
               << std::endl;
+#endif
     Float threshold = 1.0;
     while (buildFurther) {
         buildFurther = false;
@@ -127,8 +128,10 @@ void SphereTree::BuildTree() {
             if (incit1) { ++it1; }
         }
     }
+#ifndef TESTS
     std::cout << "Working list size after building tree " << mData.size()
               << std::endl;
+#endif
 #ifdef DEBUG
     PrintTree();
 #endif
