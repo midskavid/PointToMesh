@@ -66,6 +66,18 @@ SphereTree::SphereTree(std::vector<Point3f>& vertices,
     }
 }
 
+SphereTree::~SphereTree() {
+    std::cout << "Cleanup.. Deleting all nodes now..\n";
+    auto cleanup = [](SphereNode* root, const auto& func) -> void {
+        if (root) {
+            func(root->left, func);
+            func(root->right, func);
+            delete root;
+        }
+    };
+    for (auto& rt : mData) cleanup(rt, cleanup);
+}
+
 void SphereTree::BuildTree() {
     bool buildFurther = true;
 #ifndef TESTS

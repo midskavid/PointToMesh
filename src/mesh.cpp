@@ -93,6 +93,6 @@ Point3f Mesh::FindClosestPoint(Point3f& pt) {
 }
 
 void Mesh::BuildSphereTree() {
-    mSTree = new SphereTree(mVertices, mFaces);
+    mSTree = std::make_unique<SphereTree>(mVertices, mFaces);
     mSTree->BuildTree();
 }

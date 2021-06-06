@@ -25,6 +25,7 @@ class SphereTree {
 public:
     SphereTree(std::vector<Point3f>& vertices,
                std::vector<std::vector<unsigned int>>& faces);
+    ~SphereTree();
     void BuildTree();
     std::vector<unsigned int> GetFaceList(const Point3f& pt);
 

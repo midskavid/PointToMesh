@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,7 @@
 class Mesh {
 public:
     Mesh(std::string filename) : fn_(filename) {}
+    ~Mesh() {}
     void Init();
     Point3f FindClosestPointNaive(Point3f& pt);
     Point3f FindClosestPoint(Point3f& pt);
@@ -22,7 +24,7 @@ private:
 public:
     std::vector<Point3f> mVertices;
     std::vector<std::vector<unsigned int>> mFaces;
-    SphereTree* mSTree = nullptr;
+    std::unique_ptr<SphereTree> mSTree;
 };
 
 #endif
