@@ -84,7 +84,7 @@ void test_Point2Mesh() {
     meshHandle->Init();  // Read in the file
 
     meshHandle->BuildSphereTree();
-
+    std::cout << "Running with 1000 random points\n";
     for (auto ii = 0; ii < 1000; ++ii) {
         Point3f pt{dtbn(e2), dtbn(e2), dtbn(e2)};
         // Float R = dtbn(e2);
