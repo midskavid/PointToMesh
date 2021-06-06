@@ -2,3 +2,4 @@
 Point2Mesh
 release/*
 debug/*
+tests/TestPoint2Mesh

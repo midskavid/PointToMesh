@@ -18,6 +18,68 @@ namespace geometry {
         return sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    Point3f GetClosestPtToSegment(Point3f& v1,
+                                  Point3f& v2,
+                                  Point3f& p0,
+                                  Float& closestDist) {
+        auto l2 = L2squared(v1, v2);
+        // clamp between [0,1]
+        Float t =
+            std::max(Float(0), std::min(Float(1), dot(p0 - v1, v2 - v1) / l2));
+        auto pjtn = v1 + (v2 - v1) * t;
+        closestDist = L2(p0, pjtn);
+        return pjtn;
+    }
+
+    Point3f GetClosestPtToTriangleNaive(Point3f& v0,
+                                        Point3f& v1,
+                                        Point3f& v2,
+                                        Point3f& pt,
+                                        Float R,
+                                        Float& closestDist) {
+        // get normal to triangle..
+        auto v0v1_u = (v1 - v0) / L2(v1, v0);
+        auto v2v0_u = (v0 - v2) / L2(v2, v0);
+
+        auto n_cap = cross(v2v0_u, v0v1_u);
+        auto n_cap_or = n_cap;
+        // align it away from point..
+        auto v0pt_u = (pt - v0) / L2(pt, v0);
+        if (dot(v0pt_u, n_cap) > 0) n_cap = -n_cap;
+
+        // construct ray
+
+        Float t = std::abs(dot((pt - v0), n_cap));
+        auto position = pt + n_cap * t;
+        // check if r is inside triangle..
+        if (((dot(cross((v1 - v0), (position - v0)), n_cap_or)) >= 0) &&
+            ((dot(cross((v2 - v1), (position - v1)), n_cap_or)) >= 0) &&
+            ((dot(cross((v0 - v2), (position - v2)), n_cap_or)) >= 0)) {
+            // point lies inside.. that is the closest point..
+            return position;
+        }
+
+        // else nearest point is either line or vertex..
+        Float dist1, dist2, dist3;
+        auto p1 = GetClosestPtToSegment(v0, v1, pt, dist1);
+        auto p2 = GetClosestPtToSegment(v1, v2, pt, dist2);
+        auto p3 = GetClosestPtToSegment(v2, v0, pt, dist3);
+        if (dist1 < dist2) {
+            if (dist1 < dist3) {
+                closestDist = dist1;
+                return p1;
+            }
+            closestDist = dist3;
+            return p3;
+        }
+        if (dist2 < dist3) {
+            closestDist = dist2;
+            return p2;
+        }
+        closestDist = dist3;
+        return p3;
+    }
+
     Point3f GetClosestPtToTriangle(Point3f& v0,
                                    Point3f& v1,
                                    Point3f& v2,
@@ -48,47 +110,47 @@ namespace geometry {
                         t = 0.f;
                     } else {
                         s = 0.f;
-                        t = std::clamp(-e / c, 0.f, 1.f);
+                        t = std::clamp(-e / c, Float(0), Float(1.0));
                     }
                 } else {
                     s = 0.f;
-                    t = std::clamp(-e / c, 0.f, 1.f);
+                    t = std::clamp(-e / c, Float(0), Float(1.0));
                 }
             } else if (t < 0.f) {
-                s = std::clamp(-d / a, 0.f, 1.f);
+                s = std::clamp(-d / a, Float(0), Float(1.0));
                 t = 0.f;
             } else {
-                float invDet = 1.f / det;
+                Float invDet = 1.f / det;
                 s *= invDet;
                 t *= invDet;
             }
         } else {
             if (s < 0.f) {
-                float tmp0 = b + d;
-                float tmp1 = c + e;
+                Float tmp0 = b + d;
+                Float tmp1 = c + e;
                 if (tmp1 > tmp0) {
-                    float numer = tmp1 - tmp0;
-                    float denom = a - 2 * b + c;
-                    s = std::clamp(numer / denom, 0.f, 1.f);
+                    Float numer = tmp1 - tmp0;
+                    Float denom = a - 2 * b + c;
+                    s = std::clamp(numer / denom, Float(0), Float(1.0));
                     t = 1 - s;
                 } else {
-                    t = std::clamp(-e / c, 0.f, 1.f);
+                    t = std::clamp(-e / c, Float(0), Float(1.0));
                     s = 0.f;
                 }
             } else if (t < 0.f) {
                 if (a + d > b + e) {
-                    float numer = c + e - b - d;
-                    float denom = a - 2 * b + c;
-                    s = std::clamp(numer / denom, 0.f, 1.f);
+                    Float numer = c + e - b - d;
+                    Float denom = a - 2 * b + c;
+                    s = std::clamp(numer / denom, Float(0), Float(1.0));
                     t = 1 - s;
                 } else {
-                    s = std::clamp(-e / c, 0.f, 1.f);
+                    s = std::clamp(-e / c, Float(0), Float(1.0));
                     t = 0.f;
                 }
             } else {
-                float numer = c + e - b - d;
-                float denom = a - 2 * b + c;
-                s = std::clamp(numer / denom, 0.f, 1.f);
+                Float numer = c + e - b - d;
+                Float denom = a - 2 * b + c;
+                s = std::clamp(numer / denom, Float(0), Float(1.0));
                 t = 1.f - s;
             }
         }
